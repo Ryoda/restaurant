@@ -1,0 +1,40 @@
+# depslib dependency file v1.0
+1428697026 source:c:\users\general\documents\algoritmos\practicas\restaurant\listas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Listas.h"
+
+1428694663 c:\users\general\documents\algoritmos\practicas\restaurant\listas.h
+
+1428091352 c:\users\general\documents\algoritmos\practicas\restaurant\restaurant.h
+
+1428164643 source:c:\users\javier mura\desktop\practicas\restaurant\listas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Listas.h"
+
+1428164711 c:\users\javier mura\desktop\practicas\restaurant\listas.h
+
+1428165116 source:c:\users\javier mura\desktop\practicas\restaurant\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Listas.h"
+
+1428699677 source:c:\users\general\documents\algoritmos\practicas\restaurant\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"Listas.h"
+	"Pilas.h"
+
+1428462498 c:\users\general\documents\algoritmos\practicas\restaurant\pilas.h
+
+1428401279 source:c:\users\general\documents\algoritmos\practicas\restaurant\pilas.c
+	<stdio.h>
+	<stdlib.h>
+	"Pilas.h"
+
