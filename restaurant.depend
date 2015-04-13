@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1428697026 source:c:\users\general\documents\algoritmos\practicas\restaurant\listas.c
+1428798754 source:c:\users\general\documents\algoritmos\practicas\restaurant\listas.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -23,7 +23,7 @@
 	<string.h>
 	"Listas.h"
 
-1428699677 source:c:\users\general\documents\algoritmos\practicas\restaurant\main.c
+1428798149 source:c:\users\general\documents\algoritmos\practicas\restaurant\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

@@ -138,7 +138,7 @@ void imprimir(Lista lista)
         indice = lista.primero;
         while(indice != NULL)
         {
-            printf("numero de receta: %d \n", indice->informacion.receta.codigo);
+            printf("numero de receta: %04d \n", indice->informacion.receta.codigo);
             indice = indice->siguiente;
         }
         printf("\n");

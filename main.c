@@ -23,7 +23,7 @@ int main()
     FILE *fusers, *fcoments, *frecipes;
     Lista users, recetas;
     Tipo tipo_aux;
-    char cadena_auxiliar[500], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO];
+    char cadena_auxiliar[500], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO], *ptr_aux, parada[2];
     int cantidad_usuarios,cantidad_recetas,cantidad_comentarios,i,n,j, control_lectura, receta_id;
     float media;
     Comentario coment_aux;
@@ -36,7 +36,7 @@ int main()
 
     for( i = 0; i < MAX_TAGS; i++)
     {
-        palabras_clave[i][0] = '\n';
+        palabras_clave[i][0] = '\0';
     }
     //      Lectura de Variables
 
@@ -64,7 +64,7 @@ int main()
 
         fscanf(frecipes, "%d", &n);
 
-        getLine(cadena_auxiliar, 1, frecipes); //leyendo el \n que queda luego de que fscanf lee el entero
+        getc(frecipes);//getLine(cadena_auxiliar, 1, frecipes); //leyendo el \n que queda luego de que fscanf lee el entero
 
         for(j = 0; j < n; j ++)
         {
@@ -72,6 +72,7 @@ int main()
         }
 
         fscanf(frecipes,"%d",&n);
+
 
         for(j = 0; j < MAX_TAGS; j++)
         {
@@ -86,7 +87,7 @@ int main()
 
         j = 0;
 
-        getLine(cadena_auxiliar, 1,frecipes); // leyendo el \n que queda luego de que fscanf lee el ultimo tag
+        getc(frecipes);//getLine(cadena_auxiliar, 1,frecipes); // leyendo el \n que queda luego de que fscanf lee el ultimo tag
 
         getLine(cadena_auxiliar, PASOS_MAX, frecipes);
 
@@ -109,7 +110,7 @@ int main()
     //lectura de comentarios
     fscanf(fcoments,"%d", &cantidad_comentarios);
 
-    getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
+    getc(frecipes);//getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
 
     for(i = 0; i < n; i ++)
     {
@@ -174,23 +175,25 @@ int main()
 
     i = 0;
     j = 0; //leyendo las palabras clave introducidas por la terminal
-    while((aux_char = getchar()) != '\n')
-    {
-        if(aux_char != ' ')
-        {
-            strcpy(palabras_clave[j], cadena_auxiliar);
-        }else
-        {
 
+    parada[0] = ' ';
+
+    printf("Listo\n");
+    getLine(cadena_auxiliar, 500, stdin);
+
+    ptr_aux = strtok(cadena_auxiliar, parada);
+
+        while((ptr_aux) != NULL)
+        {
+            strcpy(palabras_clave[j], ptr_aux);
+            j++;
+            ptr_aux = strtok(NULL, parada);
         }
 
-    }
     buscar_Receta(recetas, palabras_clave);
 
-
-
     return 0;
-}
+} // FIN DEL MAIN
 
 void crear_Usuario(Lista * users,char username[])
 {
@@ -249,15 +252,16 @@ void buscar_Receta(Lista recetas, char (*palabras_clave)[NOMBRE_MAXIMO])
         {
             consultar(recetas, j, &tipo_aux);
             k = 0;
-            while(tipo_aux.receta.tags[j][0] != '\0' )
+            while(tipo_aux.receta.tags[k][0] != '\0' )
             {
-                if(strcmp(palabras_clave[i], tipo_aux.receta.tags[j]) == 0)
+                if(strcmp(palabras_clave[i], tipo_aux.receta.tags[k]) == 0)
                 {
                     insertar(&encontradas, tipo_aux, longitud(encontradas) + 1);
                 }
                 k++;
             }
         }
+        i++;
     }
 
     imprimir(encontradas);
@@ -282,7 +286,7 @@ int getLine (char *buff, size_t sz, FILE *fr)
         // Consume characters to line end.
 
         extra = 0;
-        while ((ch = fgetc(fr)) != '\n') {
+        while ((ch = getc(fr)) != '\n') {
           if (ch == EOF) break;
           extra = 1;
         }
