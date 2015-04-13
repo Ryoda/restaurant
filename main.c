@@ -14,7 +14,7 @@ int getLine (char *, size_t, FILE *);
 void crear_Usuario(Lista *, char *);
 void consultar_Usuario(Lista ,char *);
 void buscar_Receta(Lista, char (*)[NOMBRE_MAXIMO]);
-void leer_Receta();
+void leer_Receta(Lista,int);
 void puntuar_Receta();
 void comentar_Receta();
 
@@ -33,6 +33,8 @@ int main()
     frecipes = fopen("recetas.in", "r");
     vacia(&users);
     vacia(&recetas);
+
+    printf("Cargando...\n");
 
     for( i = 0; i < MAX_TAGS; i++)
     {
@@ -66,9 +68,12 @@ int main()
 
         getc(frecipes);//getLine(cadena_auxiliar, 1, frecipes); //leyendo el \n que queda luego de que fscanf lee el entero
 
-        for(j = 0; j < n; j ++)
+        for(j = 0; j < INGREDIENTES_MAX; j ++)
         {
-            getLine(tipo_aux.receta.ingredientes[j], INGREDIENTES_MAX, frecipes);
+            if(i < n)
+                getLine(tipo_aux.receta.ingredientes[j], INGREDIENTES_MAX, frecipes);
+            else
+                tipo_aux.receta.ingredientes[j] = '\0';
         }
 
         fscanf(frecipes,"%d",&n);
@@ -100,7 +105,8 @@ int main()
         for( ;j < PASOS_MAX;j++)
             tipo_aux.receta.pasos[j][0] = '\0'; //se marcan como vacios el resto de los pasos inicializandolos con \0
 
-        vaciaP(&tipo_aux.receta.comentarios); // inicializa la pila de comentarios
+        vaciaP(&tipo_aux.receta.comentarios); // inicializa la pila de comentarios de cada receta
+
         tipo_aux.receta.rating = 0;
 
 
@@ -120,7 +126,8 @@ int main()
 
         fscanf(fcoments,"%d", &receta_id);
 
-        consultar(recetas, receta_id + 1, &tipo_aux);
+        consultar(recetas, receta_id + 1, &tipo_aux); //se consulta de la lista, la receta a la que se desea comentar, para introducir
+                                                      //el comentario en la Pila de comentarios
 
         fscanf(fcoments, "%s", cadena_auxiliar); // lectura del nombre del usuario que hace el comentario, en caso de hacerlo
 
@@ -179,6 +186,7 @@ int main()
     parada[0] = ' ';
 
     printf("Listo\n");
+    printf()
     getLine(cadena_auxiliar, 500, stdin);
 
     ptr_aux = strtok(cadena_auxiliar, parada);
@@ -266,6 +274,64 @@ void buscar_Receta(Lista recetas, char (*palabras_clave)[NOMBRE_MAXIMO])
 
     imprimir(encontradas);
 }
+
+void leer_Receta(Lista recetas, int n)
+{
+    Tipo tipo_aux;
+    Pila pila_aux;
+    Comentario coment_aux;
+    int i, advertencia;
+    consultar(recetas, n+1, &tipo_aux);
+
+    printf("nombre de la receta: %s\n", tipo_aux.receta.nombre);
+    printf("descripcion de la receta %s\n", tipo_aux.receta.descripcion);
+    printf("usuario que publico la receta: %s\n", tipo_aux.receta.username);
+    printf("Rating de la receta: %.2f\n", tipo_aux.receta.rating);
+    printf("Lista de Ingredientes:\n");
+    i = 0;
+
+    while(tipo_aux.receta.ingredientes[i] != '\0')
+    {
+        printf("%s\n"tipo_aux.receta.ingredientes[i]);
+        i++;
+    }
+    printf("\n");
+
+    i = 0;
+    printf("Pasos a seguir para realizar la receta: \n");
+    while(tipo_aux.receta.pasos[i] != '\0')
+    {
+        printf("%s\n", tipo_aux.receta.pasos[i]);
+    }
+    i = 0;
+    printf("Palabras Clave para buscar la receta:\n");
+    while(tipo_aux.receta.tags[i] != '\0')
+    {
+        printf("%s\n", tipo_aux.receta.tags[i]);
+        i++;
+    }
+    printf("\n");
+
+    printf("Lista de comentarios: \n");
+    while(!esVaciaP(tipo_aux.receta.comentarios)) //se va imprimiendo el tope, apilando en una pila auxiliar y desapilando de la principal
+    {
+        tope(tipo_aux.receta.comentarios, &coment_aux, &advertencia);
+        printf("publicante: %s,",coment_aux.username);
+        printf("rating: %s ,",coment_aux.rating);
+        printf("fecha: %s\n", coment_aux.fecha);
+        printf("Comentario: %s \n");
+        apilar(&pila_aux, coment_aux);
+        desapilar(&tipo_aux.receta.comentarios);
+    }
+    while(!esVaciaP(pila_aux)) //reapilamos lo que estaba en la pila auxiliar en la pila de comentarios original
+    {
+        tope(pila_aux, &coment_aux, &advertencia);
+        apilar(tipo_aux.receta.comentarios, coment_aux);
+        desapilar(&pila_aux);
+    }
+}
+
+
 
 //Funcion para la lectura segura de una linea completa de caracteres, incluyendo espacios hasta el caracter de control de nueva linea, con control de desbordamientos de buffer
 
