@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include "Listas.h"
 #include "Pilas.h"
 
@@ -15,8 +14,8 @@ void crear_Usuario(Lista *, char *);
 void consultar_Usuario(Lista ,char *);
 void buscar_Receta(Lista, char (*)[NOMBRE_MAXIMO]);
 void leer_Receta(Lista,int);
-void puntuar_Receta();
-void comentar_Receta();
+void puntuar_Receta(Lista*, int, float);
+void comentar_Receta(Lista *, int, char *, char *, char *, float);
 
 int main()
 {
@@ -133,6 +132,7 @@ int main()
 
         fscanf(fcoments, "%f", &media); //lectura de la puntuacion que le coloca
 
+
             if(tipo_aux.receta.rating == 0)
             {
                 tipo_aux.receta.rating = media; //inicializacion del promedio
@@ -143,13 +143,12 @@ int main()
 
             if(aux_char == 'C')
             {
-                memset(coment_aux.texto, '\0', TEXTO_MAXIMO); //inicializamos el texto en coment_aux para evitar que el strcat concatene con el comentario anterior
+                memset(coment_aux.texto, '\0', TEXTO_MAXIMO); //inicializamos el texto en coment_aux para evitar que el strcat no concatene con el comentario anterior
                 //almacenar los datos del comentario
 
                 strcpy(coment_aux.username, cadena_auxiliar); //almacenar el nombre del usuario que comento
 
                 coment_aux.rating = media; //almacenar la puntuacion
-
                 //se continua con la lectura
 
                 getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
@@ -206,6 +205,11 @@ int main()
     scanf("%d", &n);
 
     leer_Receta(recetas, n);
+
+    printf("Introduzca la puntuacion:\n");
+
+    puntuar_Receta();
+
 
     return 0;
 } // FIN DEL MAIN
@@ -294,7 +298,7 @@ void leer_Receta(Lista recetas, int n)
     printf("nombre de la receta: %s\n", tipo_aux.receta.nombre);
     printf("descripcion de la receta %s\n", tipo_aux.receta.descripcion);
     printf("usuario que publico la receta: %s\n", tipo_aux.receta.username);
-    printf("Rating de la receta: %.2f\n", tipo_aux.receta.rating);
+    printf("Rating de la receta: %.2f \n", tipo_aux.receta.rating);
     printf("Lista de Ingredientes:\n");
     i = 0;
 
@@ -325,9 +329,9 @@ void leer_Receta(Lista recetas, int n)
     while(!esVaciaP(tipo_aux.receta.comentarios)) //se va imprimiendo el tope, apilando en una pila auxiliar y desapilando de la principal
     {
         tope(tipo_aux.receta.comentarios, &coment_aux, &advertencia);
-        printf("publicante: %s,",coment_aux.username);
+        printf("publicante: %s, ",coment_aux.username);
         printf("rating: %.2f ,",coment_aux.rating);
-        printf("fecha: %s\n", coment_aux.fecha);
+        printf("\n fecha: %s\n", coment_aux.fecha);
         printf("Comentario: %s \n", coment_aux.texto);
         apilar(&pila_aux, coment_aux);
         desapilar(&tipo_aux.receta.comentarios);
@@ -340,7 +344,29 @@ void leer_Receta(Lista recetas, int n)
     }
 }
 
+void puntuar_Receta(Lista *recetas, int i, float puntuacion)
+{
+    Tipo tipo_aux;
+    consultar(*recetas, i + 1, &tipo_aux);
+    tipo_aux.receta.rating = (tipo_aux.receta.rating + puntuacion) / 2;
+    eliminar(recetas, i + 1);
+    insertar(recetas, tipo_aux, i + 1);
+}
 
+void comentar_Receta(Lista *recetas, int i, char *usuario, char *fecha, char *texto, float puntuacion)
+{
+    Tipo tipo_aux;
+    Comentario coment_aux;
+    consultar(*recetas, i + 1, &tipo_aux);
+    strcpy(coment_aux.username, usuario);
+    strcpy(coment_aux.fecha, fecha);
+    strcpy(coment_aux.texto, texto);
+    coment_aux.rating = puntuacion;
+
+    eliminar(recetas, i + 1);
+    insertar(recetas, tipo_aux, i + 1);
+
+}
 
 //Funcion para la lectura segura de una linea completa de caracteres, incluyendo espacios hasta el caracter de control de nueva linea, con control de desbordamientos de buffer
 
