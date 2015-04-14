@@ -22,8 +22,8 @@ int main()
     FILE *fusers, *fcoments, *frecipes;
     Lista users, recetas;
     Tipo tipo_aux;
-    char cadena_auxiliar[TEXTO_MAXIMO], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO], *ptr_aux, parada[2];
-    int cantidad_usuarios,cantidad_recetas,cantidad_comentarios,i,n,j, control_lectura, receta_id;
+    char cadena_auxiliar[TEXTO_MAXIMO], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO], *ptr_aux, parada[2], fecha_aux[LONGITUD_FECHA];
+    int cantidad_usuarios,cantidad_recetas,cantidad_comentarios, i, n, j, receta_id, encontrado;
     float media;
     Comentario coment_aux;
     //inicializacion de variables
@@ -57,11 +57,11 @@ int main()
     {
         tipo_aux.receta.codigo = i-1;
 
-        control_lectura = getLine(tipo_aux.receta.username, NOMBRE_MAXIMO, frecipes);
+        getLine(tipo_aux.receta.username, NOMBRE_MAXIMO, frecipes);
 
-        control_lectura = getLine(tipo_aux.receta.nombre, NOMBRE_MAXIMO, frecipes);
+        getLine(tipo_aux.receta.nombre, NOMBRE_MAXIMO, frecipes);
 
-        control_lectura = getLine(tipo_aux.receta.descripcion, DESCRIPCION_MAXIMA, frecipes);
+        getLine(tipo_aux.receta.descripcion, DESCRIPCION_MAXIMA, frecipes);
 
         fscanf(frecipes, "%d", &n);
 
@@ -120,7 +120,6 @@ int main()
     for(i = 0; i < cantidad_comentarios; i++)
     {
         fscanf( fcoments, "%c", &aux_char);
-        printf("%c\n", aux_char);
         getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
 
         fscanf(fcoments,"%d", &receta_id);
@@ -204,11 +203,84 @@ int main()
 
     scanf("%d", &n);
 
-    leer_Receta(recetas, n);
+    if(n < cantidad_recetas)
+    {
+        leer_Receta(recetas, n);
+    }else
+    {
+        printf("Error, numero de receta invalido \n");
+    }
+    printf("Introduzca el nombre de usuario:\n");
 
-    printf("Introduzca la puntuacion:\n");
+    scanf("%s", cadena_auxiliar);
+    i = 1;
+    encontrado = 0;
+    while(i <= cantidad_usuarios && !encontrado)
+    {
+        consultar(users, i, &tipo_aux);
+        if(strcmp(tipo_aux.usuario.username, cadena_auxiliar) == 0)
+            encontrado = 1;
+        else
+            encontrado = 0;
 
-    puntuar_Receta();
+            i++;
+    }
+
+    if(!encontrado)
+    {
+        printf("Login incorrecto\n");
+    }else
+    {
+        printf("Bienvenido %s, introduzca (P) para puntuar una receta o (C) para comentar una receta. Cualquier otra tecla para salir:\n", cadena_auxiliar);
+
+        scanf("%c", &aux_char);
+
+        switch (aux_char)
+        {
+            case 'P': // lectura de receta a puntuar
+            printf("Introduzca el numero de la receta a puntuar: \n");
+                scanf("%d", &i);
+                if(i >= cantidad_recetas)
+                {
+                    printf("El numero de receta es invalido\n");
+                }else
+                {
+                    printf("Introduzca la puntuacion que desea otorgar (del 1 al 5)");
+                    scanf("%f", &media);
+                    if(media < 1 || 5 < media)
+                    {
+                        printf("Entre 1 y 5:\n");
+                    }else
+                    {
+                        puntuar_Receta(&recetas, i+1, media);
+                    }
+                }
+            break;
+            case 'C': //lectura de receta a comentar
+                printf("Introduzca el numero de receta a comentar:\n");
+                scanf("%d", &i);
+                if(i >= cantidad_recetas)
+                {
+                    printf("El numero de receta es invalido\n");
+                }else
+                {
+                    printf("Introduzca la puntuacion que desea otorgar (del 1 al 5)");
+                    scanf("%f", &media);
+                    if(media < 1 || 5 < media)
+                    {
+                        printf("Entre 1 y 5:\n");
+                    }else
+                    {
+                        printf("Introduzca la Fecha de su comentario (formato DD MM AAAA):\n");
+                        scanf("%s", fecha_aux);
+                        printf("Introduzca su comentario (maximo 500 palabras):\n");
+                        scanf("%s", cadena_auxiliar);
+                        comentar_Receta(&recetas, i+1, tipo_aux.usuario.username, fecha_aux, cadena_auxiliar, media);
+                    }
+                }
+            break;
+        }
+    }
 
 
     return 0;

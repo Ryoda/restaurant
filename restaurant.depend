@@ -45,11 +45,10 @@
 
 1428929002 c:\users\javier mura\documents\algoritmos\restaurant\listas.h
 
-1428929002 source:c:\users\javier mura\documents\algoritmos\restaurant\main.c
+1429043924 source:c:\users\javier mura\documents\algoritmos\restaurant\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	<ctype.h>
 	"Listas.h"
 	"Pilas.h"
 
