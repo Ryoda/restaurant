@@ -232,7 +232,7 @@ int main()
     }else
     {
         printf("Bienvenido %s, introduzca (P) para puntuar una receta o (C) para comentar una receta. Cualquier otra tecla para salir:\n", cadena_auxiliar);
-
+        fflush(stdin);
         scanf("%c", &aux_char);
 
         switch (aux_char)
@@ -273,9 +273,10 @@ int main()
                     {
                         printf("Introduzca la Fecha de su comentario (formato DD MM AAAA):\n");
                         scanf("%s", fecha_aux);
+                        fflush(stdin);
                         printf("Introduzca su comentario (maximo 500 palabras):\n");
                         scanf("%s", cadena_auxiliar);
-                        comentar_Receta(&recetas, i+1, tipo_aux.usuario.username, fecha_aux, cadena_auxiliar, media);
+                        comentar_Receta(&recetas, i, tipo_aux.usuario.username, fecha_aux, cadena_auxiliar, media);
                     }
                 }
             break;
