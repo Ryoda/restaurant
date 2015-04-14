@@ -23,7 +23,7 @@ int main()
     FILE *fusers, *fcoments, *frecipes;
     Lista users, recetas;
     Tipo tipo_aux;
-    char cadena_auxiliar[500], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO], *ptr_aux, parada[2];
+    char cadena_auxiliar[TEXTO_MAXIMO], aux_char, palabras_clave[MAX_TAGS][NOMBRE_MAXIMO], *ptr_aux, parada[2];
     int cantidad_usuarios,cantidad_recetas,cantidad_comentarios,i,n,j, control_lectura, receta_id;
     float media;
     Comentario coment_aux;
@@ -68,12 +68,12 @@ int main()
 
         getc(frecipes);//getLine(cadena_auxiliar, 1, frecipes); //leyendo el \n que queda luego de que fscanf lee el entero
 
-        for(j = 0; j < INGREDIENTES_MAX; j ++)
+        for(j = 0; j < INGREDIENTES_MAX; j++)
         {
-            if(i < n)
+            if(j < n)
                 getLine(tipo_aux.receta.ingredientes[j], INGREDIENTES_MAX, frecipes);
             else
-                tipo_aux.receta.ingredientes[j] = '\0';
+                tipo_aux.receta.ingredientes[j][0] = '\0';
         }
 
         fscanf(frecipes,"%d",&n);
@@ -94,12 +94,12 @@ int main()
 
         getc(frecipes);//getLine(cadena_auxiliar, 1,frecipes); // leyendo el \n que queda luego de que fscanf lee el ultimo tag
 
-        getLine(cadena_auxiliar, PASOS_MAX, frecipes);
+        getLine(cadena_auxiliar, TEXTO_MAXIMO, frecipes);
 
         while(strcmp(cadena_auxiliar, "Fin") != 0)
         {
             strcpy(tipo_aux.receta.pasos[j], cadena_auxiliar);
-            getLine(cadena_auxiliar, PASOS_MAX, frecipes);
+            getLine(cadena_auxiliar, TEXTO_MAXIMO, frecipes);
             j++;
         }
         for( ;j < PASOS_MAX;j++)
@@ -116,12 +116,12 @@ int main()
     //lectura de comentarios
     fscanf(fcoments,"%d", &cantidad_comentarios);
 
-    getc(frecipes);//getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
+    getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
 
-    for(i = 0; i < n; i ++)
+    for(i = 0; i < cantidad_comentarios; i++)
     {
         fscanf( fcoments, "%c", &aux_char);
-
+        printf("%c\n", aux_char);
         getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
 
         fscanf(fcoments,"%d", &receta_id);
@@ -143,6 +143,7 @@ int main()
 
             if(aux_char == 'C')
             {
+                memset(coment_aux.texto, '\0', TEXTO_MAXIMO); //inicializamos el texto en coment_aux para evitar que el strcat concatene con el comentario anterior
                 //almacenar los datos del comentario
 
                 strcpy(coment_aux.username, cadena_auxiliar); //almacenar el nombre del usuario que comento
@@ -159,21 +160,21 @@ int main()
 
                 //ahora a leer el texto del comentario
 
-                getLine(cadena_auxiliar, LONGITUD_FECHA, fcoments);
+                getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments);
 
                 while(strcmp(cadena_auxiliar, "Fin") != 0)
                 {
+                    strcat(coment_aux.texto, "\n");
                     strcat(coment_aux.texto, cadena_auxiliar);
                     getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments);
                 }
+                    apilar(&tipo_aux.receta.comentarios, coment_aux); //se apila en los comentarios
             }
 
             if(aux_char == 'P')
             {
                 getLine(cadena_auxiliar, TEXTO_MAXIMO, fcoments); //leyendo el \n que queda luego del scanf
             }
-
-            apilar(&tipo_aux.receta.comentarios, coment_aux); //se apila en los comentarios
 
             eliminar(&recetas, receta_id + 1); //se elimina la vieja receta en la lista
 
@@ -186,7 +187,7 @@ int main()
     parada[0] = ' ';
 
     printf("Listo\n");
-    printf()
+    printf("Introduzca las palabras clave de lo que desea buscar:\n");
     getLine(cadena_auxiliar, 500, stdin);
 
     ptr_aux = strtok(cadena_auxiliar, parada);
@@ -199,6 +200,12 @@ int main()
         }
 
     buscar_Receta(recetas, palabras_clave);
+
+    printf("Introduzca el numero de la receta que desea leer:\n");
+
+    scanf("%d", &n);
+
+    leer_Receta(recetas, n);
 
     return 0;
 } // FIN DEL MAIN
@@ -281,6 +288,7 @@ void leer_Receta(Lista recetas, int n)
     Pila pila_aux;
     Comentario coment_aux;
     int i, advertencia;
+    vaciaP(&pila_aux);
     consultar(recetas, n+1, &tipo_aux);
 
     printf("nombre de la receta: %s\n", tipo_aux.receta.nombre);
@@ -290,22 +298,23 @@ void leer_Receta(Lista recetas, int n)
     printf("Lista de Ingredientes:\n");
     i = 0;
 
-    while(tipo_aux.receta.ingredientes[i] != '\0')
+    while(tipo_aux.receta.ingredientes[i][0] != '\0')
     {
-        printf("%s\n"tipo_aux.receta.ingredientes[i]);
+        printf("%s\n",tipo_aux.receta.ingredientes[i]);
         i++;
     }
     printf("\n");
 
     i = 0;
     printf("Pasos a seguir para realizar la receta: \n");
-    while(tipo_aux.receta.pasos[i] != '\0')
+    while(tipo_aux.receta.pasos[i][0] != '\0')
     {
         printf("%s\n", tipo_aux.receta.pasos[i]);
+        i++;
     }
     i = 0;
     printf("Palabras Clave para buscar la receta:\n");
-    while(tipo_aux.receta.tags[i] != '\0')
+    while(tipo_aux.receta.tags[i][0] != '\0')
     {
         printf("%s\n", tipo_aux.receta.tags[i]);
         i++;
@@ -317,16 +326,16 @@ void leer_Receta(Lista recetas, int n)
     {
         tope(tipo_aux.receta.comentarios, &coment_aux, &advertencia);
         printf("publicante: %s,",coment_aux.username);
-        printf("rating: %s ,",coment_aux.rating);
+        printf("rating: %.2f ,",coment_aux.rating);
         printf("fecha: %s\n", coment_aux.fecha);
-        printf("Comentario: %s \n");
+        printf("Comentario: %s \n", coment_aux.texto);
         apilar(&pila_aux, coment_aux);
         desapilar(&tipo_aux.receta.comentarios);
     }
     while(!esVaciaP(pila_aux)) //reapilamos lo que estaba en la pila auxiliar en la pila de comentarios original
     {
         tope(pila_aux, &coment_aux, &advertencia);
-        apilar(tipo_aux.receta.comentarios, coment_aux);
+        apilar(&tipo_aux.receta.comentarios, coment_aux);
         desapilar(&pila_aux);
     }
 }
